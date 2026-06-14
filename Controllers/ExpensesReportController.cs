@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ namespace pearl_leasing.Controllers
     [Route("api/expense-reports")]
     public class ExpensesReportController : ControllerBase
     {
-        
+
         private readonly PearlLeasingDbContext _context;
         public ExpensesReportController(PearlLeasingDbContext context)
         {
@@ -21,21 +22,23 @@ namespace pearl_leasing.Controllers
         }
 
         [HttpPost("create-expense-report")]
-        public async Task<IActionResult> CreateExpenseReport([FromBody] CreateExpensesRequestDto request)
+        public async Task<IActionResult> CreateExpenseReport(
+    [FromBody] CreateExpensesRequestDto request,
+    [FromServices] IValidator<CreateExpensesRequestDto> validator)
         {
-            if (request == null || string.IsNullOrWhiteSpace(request.ReportName))
+            var validationResult = await validator.ValidateAsync(request);
+
+            if (!validationResult.IsValid)
             {
-                return BadRequest("Report Name is required.");
+                return BadRequest(validationResult.Errors.Select(e => new { e.PropertyName, e.ErrorMessage }));
             }
 
-            decimal calculatedTotal =                                                                           request.Electricity +
-                                     request.Water +
-                                     request.OtherUtilities;
+            decimal calculatedTotal = request.Electricity + request.Water + request.OtherUtilities;
 
             var newExpense = new ExpensesReport
             {
                 ReportName = request.ReportName.Trim(),
-                                                Electricity = request.Electricity,
+                Electricity = request.Electricity,
                 Water = request.Water,
                 OtherUtilities = request.OtherUtilities,
                 TotalAmount = calculatedTotal
@@ -66,11 +69,11 @@ namespace pearl_leasing.Controllers
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
-                        if (pageNumber < 1) pageNumber = 1;
+            if (pageNumber < 1) pageNumber = 1;
             if (pageSize < 1) pageSize = 10;
 
-                        var expense = await _context.ExpenseReports
-                .FirstOrDefaultAsync(e => e.Id == id);
+            var expense = await _context.ExpenseReports
+    .FirstOrDefaultAsync(e => e.Id == id);
 
             if (expense == null)
             {
@@ -104,14 +107,14 @@ namespace pearl_leasing.Controllers
                     grandTotalAmount = expense.TotalAmount,
                     createdAt = expense.CreatedAt,
 
-                                        currentRowPage = pageNumber,
+                    currentRowPage = pageNumber,
                     pageSize = pageSize,
                     totalRowsCount = totalRows,
                     totalRowPages = totalPages,
                     hasNextRowPage = pageNumber < totalPages,
                     hasPreviousRowPage = pageNumber > 1,
 
-                                        rows = paginatedRows
+                    rows = paginatedRows
                 });
             }
             catch (Exception)
@@ -123,31 +126,33 @@ namespace pearl_leasing.Controllers
         [HttpGet("get-all-expenses-report")]
         public async Task<IActionResult> GetAllExpenses([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-                        if (pageNumber < 1) pageNumber = 1;
+            if (pageNumber < 1) pageNumber = 1;
             if (pageSize < 1) pageSize = 10;
 
             try
             {
-                                int totalRecords = await _context.ExpenseReports.CountAsync();
+                int totalRecords = await _context.ExpenseReports.CountAsync();
 
-                                var expenses = await _context.ExpenseReports
-                    .OrderByDescending(e => e.CreatedAt)                     .Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
+                var expenses = await _context.ExpenseReports
+    .OrderByDescending(e => e.CreatedAt).Skip((pageNumber - 1) * pageSize)
+    .Take(pageSize)
+    .ToListAsync();
 
-                                var formattedExpenses = expenses.Select(e => new
+                var formattedExpenses = expenses.Select(e => new
                 {
                     Id = e.Id,
-                    ReportId = "EP" + e.Id.ToString().PadLeft(5, '0'),                     ReportName = e.ReportName,
-                                                            Electricity = e.Electricity,
+                    ReportId = "EP" + e.Id.ToString().PadLeft(5, '0'),
+                    ReportName = e.ReportName,
+                    Electricity = e.Electricity,
                     Water = e.Water,
                     OtherUtilities = e.OtherUtilities,
-                    GrandTotalAmount = e.TotalAmount,                     ReportDate = e.CreatedAt
+                    GrandTotalAmount = e.TotalAmount,
+                    ReportDate = e.CreatedAt
                 }).ToList();
 
-                                int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+                int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
 
-                                return Ok(new
+                return Ok(new
                 {
                     message = "Successfully retrieved expense reports.",
                     currentPage = pageNumber,
@@ -168,7 +173,7 @@ namespace pearl_leasing.Controllers
         [HttpPost("update-expense-report")]
         public async Task<IActionResult> UpdateExpenseReport([FromBody] UpdateExpenseReportDto request)
         {
-                        if (request == null)
+            if (request == null)
             {
                 return BadRequest(new { code = "EMPTY_PAYLOAD", message = "Payload cannot be empty." });
             }
@@ -180,25 +185,25 @@ namespace pearl_leasing.Controllers
 
             try
             {
-                                var dbReport = await _context.ExpenseReports
-                    .FirstOrDefaultAsync(r => r.Id == request.Id);
+                var dbReport = await _context.ExpenseReports
+    .FirstOrDefaultAsync(r => r.Id == request.Id);
 
                 if (dbReport == null)
                 {
                     return NotFound(new { code = "REPORT_NOT_FOUND", message = $"Expense report with ID {request.Id} does not exist." });
                 }
 
-                                dbReport.ReportName = request.ReportName.Trim();
+                dbReport.ReportName = request.ReportName.Trim();
                 dbReport.Electricity = request.Electricity;
                 dbReport.Water = request.Water;
                 dbReport.OtherUtilities = request.OtherUtilities;
 
-                                dbReport.TotalAmount = request.Electricity + request.Water + request.OtherUtilities;
+                dbReport.TotalAmount = request.Electricity + request.Water + request.OtherUtilities;
 
-                                
-                                await _context.SaveChangesAsync();
 
-                                return Ok(new
+                await _context.SaveChangesAsync();
+
+                return Ok(new
                 {
                     message = "Expense report updated successfully!",
                     id = dbReport.Id,
@@ -208,7 +213,7 @@ namespace pearl_leasing.Controllers
             }
             catch (Exception ex)
             {
-                                Console.WriteLine($"[Expense Update Error]: {ex.Message}");
+                Console.WriteLine($"[Expense Update Error]: {ex.Message}");
                 return StatusCode(500, new { code = "SERVER_ERROR", message = "An error occurred while updating the expense report." });
             }
         }
