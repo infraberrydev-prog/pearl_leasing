@@ -22,7 +22,6 @@ namespace pearl_leasing.Controllers
         [HttpPost("save-reports")]
         public async Task<IActionResult> SaveReports([FromBody] List<CreateReportDto> requests)
         {
-            // 1. Safety check kung walang ipinasang data ang Front-end
             if (requests == null || !requests.Any())
             {
                 return BadRequest(new ErrorResponse(400, "INVALID_REPORTS", "No reports provided for saving."));
@@ -31,10 +30,8 @@ namespace pearl_leasing.Controllers
             var validator = new CreateReportValidator();
             var savedReportsList = new List<LeasingReport>();
 
-            // Listahan para ipunin ang mga validation errors kung meron man sa mga reports
             var validationErrors = new List<string>();
 
-            // 2. I-validate muna natin ang lahat ng reports bago mag-save (Para iwas partial save)
             foreach (var reportRequest in requests)
             {
                 var validationResult = await validator.ValidateAsync(reportRequest);
@@ -44,7 +41,6 @@ namespace pearl_leasing.Controllers
                 }
             }
 
-            // Kung may sumabog sa validation, i-reject agad ang buong request
             if (validationErrors.Any())
             {
                 return BadRequest(new ErrorResponse(
@@ -54,7 +50,6 @@ namespace pearl_leasing.Controllers
                 ));
             }
 
-            // 3. Sabay na Processing (Single man o Bulk, iisa na lang ang loop logic natin)
             foreach (var reportRequest in requests)
             {
                 if (string.IsNullOrWhiteSpace(reportRequest.ReportName)) continue;
@@ -102,7 +97,6 @@ namespace pearl_leasing.Controllers
                 savedReportsList.Add(newReport);
             }
 
-            // 4. Isang selyuhan na lang sa Database
             try
             {
                 await _context.SaveChangesAsync();
@@ -144,7 +138,6 @@ namespace pearl_leasing.Controllers
                         ReportName = r.ReportName,
                         ReportDate = r.CreatedAt,
                         GrandTotalAmount = r.GrandTotalAmount,
-                        // 🎯 ADJUSTMENT: Sinala natin ang null values dahil nullable na si BuildingId ngayon
                         IncludedBuildings = r.Rows.Select(row => row.BuildingId).Where(id => id.HasValue).Distinct().ToList(),
                         TotalRowsCount = r.Rows.Count
                     })
@@ -193,13 +186,12 @@ namespace pearl_leasing.Controllers
                 int totalRows = await _context.LeasingReportRows
                     .CountAsync(row => row.LeasingReportId == id);
 
-                // 🎯 ANG LUNAS: Alisin ang dalawang .Include() na nagpapasabog sa strings!
                 var paginatedRows = await _context.LeasingReportRows
-                    .Where(row => row.LeasingReportId == id)
-                    .OrderBy(row => row.Id)
-                    .Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
+    .Where(row => row.LeasingReportId == id)
+    .OrderBy(row => row.Id)
+    .Skip((pageNumber - 1) * pageSize)
+    .Take(pageSize)
+    .ToListAsync();
 
                 int totalPages = (int)Math.Ceiling((double)totalRows / pageSize);
 
@@ -372,7 +364,6 @@ namespace pearl_leasing.Controllers
                         ReportName = r.ReportName,
                         ReportDate = r.CreatedAt,
                         GrandTotalAmount = r.GrandTotalAmount,
-                        // 🎯 REFACTOR: Ibalik ang string names o IDs depende sa kailangan ng FE dropdown
                         IncludedBuildings = r.Rows.Where(row => row.BuildingId.HasValue).Select(row => row.BuildingId!.Value).Distinct().ToList(),
                         TotalRowsCount = r.Rows.Count
                     })
@@ -387,7 +378,6 @@ namespace pearl_leasing.Controllers
             }
             catch (Exception ex)
             {
-                // Mas ligtas kung i-log mo si ex sa console para sa debugging mo pre
                 return StatusCode(500, $"An error occurred while executing the search filter: {ex.Message}");
             }
         }
