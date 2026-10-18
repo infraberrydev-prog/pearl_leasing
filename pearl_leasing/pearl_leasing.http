@@ -1,0 +1,25 @@
+@pearl_leasing_HostAddress = http://localhost:7261
+# Pwede mo rin gamitin ang HTTPS port mo (e.g., https://localhost:7162) kung ayaw ng HTTP.
+
+### 1. CREATE ADMIN USER
+POST {{pearl_leasing_HostAddress}}/api/users/create-user
+Content-Type: application/json
+
+{
+  "username": "admin_pearl",
+  "email": "admin@pearlleasing.com",
+  "password": "SecurePassword123!",
+  "firstName": "Keneth",
+  "lastName": "Liwanag"
+}
+
+###
+
+### 2. LOGIN USER (Para makuha ang JWT Token)
+POST {{pearl_leasing_HostAddress}}/api/users/login
+Content-Type: application/json
+
+{
+  "username": "admin_pearl",
+  "password": "SecurePassword123!"
+}
