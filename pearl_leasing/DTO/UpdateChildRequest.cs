@@ -1,4 +1,6 @@
-﻿namespace pearl_leasing.DTO
+﻿using FluentValidation;
+
+namespace pearl_leasing.DTO
 {
     public record UpdateChildRequest
     (
@@ -21,6 +23,45 @@
         decimal? PylonRental,
         decimal? PenaltyTenPercent
     );
+
+    public class UpdateChildRequestValidator : AbstractValidator<UpdateChildRequest>
+    {
+        public UpdateChildRequestValidator()
+        {
+            RuleFor(x => x.Id).GreaterThan(0);
+            RuleFor(x => x.BuildingId).GreaterThan(0);
+            RuleFor(x => x.StallUnitId).GreaterThan(0);
+            RuleFor(x => x.Building).NotEmpty();
+            RuleFor(x => x.VendorNameOrCategory).NotEmpty();
+            RuleFor(x => x.StallUnit).NotEmpty();
+            RuleFor(x => x.NameOfLessee).NotEmpty();
+            RuleFor(x => x.MonthlyRental).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.Electricity).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.Water).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.OtherUtilities).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.CusaFee).GreaterThanOrEqualTo(0).When(x => x.CusaFee.HasValue);
+            RuleFor(x => x.PylonRental).GreaterThanOrEqualTo(0).When(x => x.PylonRental.HasValue);
+            RuleFor(x => x.PenaltyTenPercent).GreaterThanOrEqualTo(0).When(x => x.PenaltyTenPercent.HasValue);
+        }
+    }
+
+    public class AddSingleRowRequestValidator : AbstractValidator<AddSingleRowRequest>
+    {
+        public AddSingleRowRequestValidator()
+        {
+            RuleFor(x => x.BuildingId).GreaterThan(0);
+            RuleFor(x => x.StallUnitId).GreaterThan(0);
+            RuleFor(x => x.VendorNameOrCategory).NotEmpty();
+            RuleFor(x => x.NameOfLessee).NotEmpty();
+            RuleFor(x => x.MonthlyRental).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.Electricity).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.Water).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.OtherUtilities).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.CusaFee).GreaterThanOrEqualTo(0).When(x => x.CusaFee.HasValue);
+            RuleFor(x => x.PylonRental).GreaterThanOrEqualTo(0).When(x => x.PylonRental.HasValue);
+            RuleFor(x => x.PenaltyTenPercent).GreaterThanOrEqualTo(0).When(x => x.PenaltyTenPercent.HasValue);
+        }
+    }
 
     // DTO para sa pagdagdag ng bagong row sa umiiral na Report
     public record AddReportRowRequest(

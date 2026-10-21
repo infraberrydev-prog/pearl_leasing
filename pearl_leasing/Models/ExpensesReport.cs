@@ -11,19 +11,20 @@ namespace pearl_leasing.Models
         public decimal Payroll { get; set; } = 0.00m;
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal CashAdvance { get; set; } = 0.00m;
-
-        [Column(TypeName = "decimal(18,2)")]
         public decimal Electricity { get; set; } = 0.00m;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Water { get; set; } = 0.00m;
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal OtherUtilities { get; set; } = 0.00m;
+        public decimal MaintenanceExpenses { get; set; } = 0.00m;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? LastDateUpdated { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public string? DeletedBy { get; set; }
     }
 }

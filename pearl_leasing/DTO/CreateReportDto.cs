@@ -50,7 +50,7 @@ namespace pearl_leasing.DTO
                 .NotEmpty().WithErrorCode("RE001").WithMessage("{PropertyName} is required.");
 
             RuleFor(x => x.Rows)
-                .NotEmpty().WithErrorCode("RE014").WithMessage("Report must contain at least one row.")
+                .NotEmpty().WithErrorCode("RE016").WithMessage("Report must contain at least one row.")
                 .ForEach(row => row.SetValidator(new CreateReportRowValidator()));
         }
     }
@@ -64,36 +64,42 @@ namespace pearl_leasing.DTO
             RuleFor(x => x.BuildingId)
                 .NotEmpty().WithErrorCode("RE002").WithMessage("{PropertyName} is required.");
 
-            RuleFor(x => x.VendorNameOrCategory)
+            RuleFor(x => x.BuildingType)
                 .NotEmpty().WithErrorCode("RE003").WithMessage("{PropertyName} is required.");
 
-            RuleFor(x => x.StallUnitId)
+            RuleFor(x => x.StallUnit)
                 .NotEmpty().WithErrorCode("RE004").WithMessage("{PropertyName} is required.");
 
-            RuleFor(x => x.NameOfLessee)
+            RuleFor(x => x.VendorNameOrCategory)
                 .NotEmpty().WithErrorCode("RE005").WithMessage("{PropertyName} is required.");
 
+            RuleFor(x => x.StallUnitId)
+                .NotEmpty().WithErrorCode("RE006").WithMessage("{PropertyName} is required.");
+
+            RuleFor(x => x.NameOfLessee)
+                .NotEmpty().WithErrorCode("RE007").WithMessage("{PropertyName} is required.");
+
             RuleFor(x => x.MonthlyRental)
-                .NotEmpty().WithErrorCode("RE006").WithMessage("{PropertyName} is required.")
-                .GreaterThanOrEqualTo(0).WithErrorCode("RE007").WithMessage("{PropertyName} must be 0 or greater.");
+                .NotEmpty().WithErrorCode("RE008").WithMessage("{PropertyName} is required.")
+                .GreaterThanOrEqualTo(0).WithErrorCode("RE009").WithMessage("{PropertyName} must be 0 or greater.");
 
             RuleFor(x => x.PaymentStatus)
-                .NotEmpty().WithErrorCode("RE008").WithMessage("{PropertyName} is required.");
-
-            RuleFor(x => x.PaymentMethod)
-                .NotEmpty().WithErrorCode("RE009").WithMessage("{PropertyName} is required.");
-
-            RuleFor(x => x.ReferenceNumber)
                 .NotEmpty().WithErrorCode("RE010").WithMessage("{PropertyName} is required.");
 
+            RuleFor(x => x.PaymentMethod)
+                .NotEmpty().WithErrorCode("RE011").WithMessage("{PropertyName} is required.");
+
+            RuleFor(x => x.ReferenceNumber)
+                .NotEmpty().WithErrorCode("RE012").WithMessage("{PropertyName} is required.");
+
             RuleFor(x => x.Electricity)
-                .GreaterThanOrEqualTo(0).WithErrorCode("RE011").WithMessage("{PropertyName} must be 0 or greater.");
+                .GreaterThanOrEqualTo(0).WithErrorCode("RE013").WithMessage("{PropertyName} must be 0 or greater.");
 
             RuleFor(x => x.Water)
-                .GreaterThanOrEqualTo(0).WithErrorCode("RE012").WithMessage("{PropertyName} must be 0 or greater.");
+                .GreaterThanOrEqualTo(0).WithErrorCode("RE014").WithMessage("{PropertyName} must be 0 or greater.");
 
             RuleFor(x => x.OtherUtilities)
-                .GreaterThanOrEqualTo(0).WithErrorCode("RE013").WithMessage("{PropertyName} must be 0 or greater.");
+                .GreaterThanOrEqualTo(0).WithErrorCode("RE015").WithMessage("{PropertyName} must be 0 or greater.");
         }
     }
 }

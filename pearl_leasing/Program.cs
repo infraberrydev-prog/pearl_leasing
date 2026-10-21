@@ -1,8 +1,11 @@
 using ClosedXML.Parser;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using pearl_leasing.Data;
+using pearl_leasing.DTO;
 using Scalar.AspNetCore;
 using System.Text;
 
@@ -17,6 +20,41 @@ var builder = WebApplication.CreateBuilder(args); builder.Services.AddCors(optio
     });
 });
 builder.Services.AddControllers();
+builder.Services.AddTransient<IValidator<CreateExpensesRequestDto>, CreateExpensesRequestDtoValidator>();
+builder.Services.AddTransient<IValidator<UpdateExpenseReportDto>, UpdateExpenseReportDtoValidator>();
+builder.Services.AddTransient<IValidator<DownloadReportsRequest>, DownloadReportsRequestValidator>();
+builder.Services.AddTransient<IValidator<UpdateReportRowDto>, UpdateReportRowDtoValidator>();
+builder.Services.AddTransient<IValidator<UpdateChildRequest>, UpdateChildRequestValidator>();
+builder.Services.AddTransient<IValidator<AddSingleRowRequest>, AddSingleRowRequestValidator>();
+builder.Services.AddTransient<IValidator<CreateReportDto>, CreateReportValidator>();
+
+builder.Services.AddOutputCache(options =>
+{
+    options.AddPolicy("ReportsListCache", policy =>
+        policy.Expire(TimeSpan.FromMinutes(10))
+              .SetVaryByQuery("search", "startDateCreated", "endDateCreated", "minRevenue", "maxRevenue", "lastUpdated", "page", "pageSize", "sortBy")
+              .Tag("reports-cache-tag"));
+
+    options.AddPolicy("ExpensesListCache", policy =>
+        policy.Expire(TimeSpan.FromMinutes(5))
+              .SetVaryByQuery("searchTerm", "startDateCreated", "endDateCreated", "minExpenses", "maxExpenses", "lastUpdated", "pageNumber", "pageSize", "sortBy")
+              .Tag("expenses-data"));
+});
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("StrictWritePolicy", opt =>
+    {
+        opt.PermitLimit = 15;
+        opt.Window = TimeSpan.FromMinutes(1);
+    });
+
+    options.AddFixedWindowLimiter("DownloadPolicy", opt =>
+    {
+        opt.PermitLimit = 5;
+        opt.Window = TimeSpan.FromMinutes(1);
+    });
+});
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 

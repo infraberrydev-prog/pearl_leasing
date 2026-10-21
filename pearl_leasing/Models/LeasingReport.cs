@@ -9,6 +9,9 @@ namespace pearl_leasing.Models
         public decimal GrandTotalAmount { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? LastDateUpdated { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public string? DeletedBy { get; set; }
 
         public List<LeasingReportRow> Rows { get; set; } = new();
     }

@@ -31,15 +31,6 @@ public partial class PearlLeasingDbContext : DbContext
     public DbSet<AuditLogs> AuditLogs { get; set; }
     public DbSet<Logs_DeletedReports> Logs_DeletedReports { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder.UseNpgsql("Host=aws-0-ap-southeast-2.pooler.supabase.com;Database=postgres;Username=postgres.eyolmatsshuhxugevdjo;Password=4lbB2rqmUfwmR3Hn;SSL Mode=Require;Trust Server Certificate=true");
-        }
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Role>(entity =>

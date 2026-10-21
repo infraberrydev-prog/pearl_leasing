@@ -90,16 +90,25 @@ namespace pearl_leasing.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("CashAdvance")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
 
                     b.Property<decimal>("Electricity")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("OtherUtilities")
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastDateUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<decimal>("MaintenanceExpenses")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Payroll")
@@ -131,8 +140,17 @@ namespace pearl_leasing.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
                     b.Property<decimal>("GrandTotalAmount")
                         .HasColumnType("numeric");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LastDateUpdated")
                         .HasColumnType("timestamp without time zone");

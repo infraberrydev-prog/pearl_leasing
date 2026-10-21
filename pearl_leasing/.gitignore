@@ -19,4 +19,4 @@ obj/
 
 # Kung ayaw mong mai-upload ang local connection strings mo sa GitHub,
 # i-uncomment mo ito (tanggalin ang #):
-# appsettings.Development.json
+appsettings.Development.json

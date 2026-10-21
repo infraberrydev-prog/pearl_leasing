@@ -8,6 +8,17 @@
         List<ReportRowDetailsDto> rowData
     );
 
+    public record ReportExpensesDetailsResponse(
+        string ReportId,
+        string ReportName,
+        decimal Electricity,
+        decimal Payroll,
+        decimal Water,
+        decimal MaintenanceExpenses,
+        decimal TotalAmount,
+        string message
+    );
+
     public record ReportRowDetailsDto(
         int Id,
         string BuildingType,

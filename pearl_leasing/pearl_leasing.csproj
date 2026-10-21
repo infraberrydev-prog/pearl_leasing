@@ -7,6 +7,7 @@
 	<NuGetAudit>true</NuGetAudit>
     <NuGetAuditLevel>critical</NuGetAuditLevel>
 	<NoWarn>$(NoWarn);NU1903</NoWarn>
+	<UserSecretsId>0a4227f2-38e8-4294-9179-26e671a87561</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
