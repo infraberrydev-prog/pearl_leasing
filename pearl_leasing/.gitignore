@@ -1,0 +1,22 @@
+# ==========================================
+# 🛑 PANG-DOTNET / VISUAL STUDIO (.NET 10)
+# ==========================================
+bin/
+obj/
+.vs/
+
+# User-specific files at caches (hindi dapat i-share sa ka-team)
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ==========================================
+# 🛑 CONFIGURATIONS & SECRETS
+# ==========================================
+.env
+.env.development.local
+
+# Kung ayaw mong mai-upload ang local connection strings mo sa GitHub,
+# i-uncomment mo ito (tanggalin ang #):
+appsettings.Development.json
